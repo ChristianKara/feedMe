@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, Yelp, $timeout, $http) {
+.controller('DashCtrl', function( $scope, Yelp, $timeout, $http, $cordovaGeolocation) {
   
 
 
@@ -11,9 +11,11 @@ var options = {
 },
 barIndex=0;
 
-function success(pos) {
-  $timeout(function(){
-      var crd = pos.coords;
+  var posOptions = {timeout: 10000, enableHighAccuracy: false};
+  $cordovaGeolocation
+    .getCurrentPosition(options)
+    .then(function (position) {
+            var crd = position.coords;
       console.log('Your current position is:');
       $scope.lat =  crd.latitude;
       $scope.long = crd.longitude;
@@ -29,8 +31,16 @@ function success(pos) {
             });
 
               })
-  }, 500)
-};
+ 
+    }, function(err) {
+      // error
+    });
+
+
+
+
+
+
 
 $scope.nextBar=function(){
   if(barIndex===$scope.funPlaces.length-1){
@@ -39,15 +49,8 @@ $scope.nextBar=function(){
   $scope.currentBar=$scope.funPlaces[barIndex]
   barIndex++;
 }
-
-
-function error(err) {
-  console.warn('ERROR(' + err.code + '): ' + err.message);
-};
-
-navigator.geolocation.watchPosition(success, error, options);
- 
 })
+
 
 .controller('ChatsCtrl', function($scope, Chats) {
   // With the new view caching in Ionic, Controllers are only called
